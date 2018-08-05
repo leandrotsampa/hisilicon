@@ -1,6 +1,8 @@
 package hisilicon
 
 import (
+	"os"
+	"sync"
 	"unsafe"
 )
 
@@ -706,3 +708,9 @@ const (
 	HI_ERR_SPI_WRITE_TIMEOUT HI_U32 = (0x80700008)
 	HI_ERR_SPI_READ_TIMEOUT  HI_U32 = (0x80700009)
 )
+
+type HiDevice struct {
+	mu    sync.Mutex
+	fd    *os.File
+	InUse int
+}

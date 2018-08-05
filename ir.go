@@ -4,14 +4,9 @@ import (
 	"encoding/binary"
 	"errors"
 	"os"
-	"sync"
 )
 
-var (
-	mu     sync.Mutex
-	fd     *os.File = nil
-	in_use int      = 0
-)
+var ir = HiDevice{fd: nil, InUse: 0}
 
 /*************************************************************
 Function:       HI_UNF_IR_Init
@@ -26,16 +21,16 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_IR_Init() (bool, error) {
-	mu.Lock()
-	defer mu.Unlock()
+	ir.mu.Lock()
+	defer ir.mu.Unlock()
 
-	if fd != nil {
-		in_use++
+	if ir.fd != nil {
+		ir.InUse++
 		return true, nil
 	}
 
 	var err error
-	if fd, err = os.OpenFile("/dev/hi_ir", os.O_RDWR, 0); err != nil {
+	if ir.fd, err = os.OpenFile("/dev/hi_ir", os.O_RDWR, 0); err != nil {
 		return false, err
 	}
 
@@ -55,17 +50,17 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_IR_DeInit() (bool, error) {
-	mu.Lock()
-	defer mu.Unlock()
+	ir.mu.Lock()
+	defer ir.mu.Unlock()
 
-	if fd == nil {
+	if ir.fd == nil {
 		return true, nil
-	} else if in_use > 0 {
-		in_use--
+	} else if ir.InUse > 0 {
+		ir.InUse--
 		return true, nil
 	}
 
-	if err := fd.Close(); err != nil {
+	if err := ir.fd.Close(); err != nil {
 		return false, err
 	}
 
@@ -85,7 +80,7 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_IR_Enable(bEnable HI_BOOL) (bool, error) {
-	if fd == nil {
+	if ir.fd == nil {
 		return false, errors.New("IR Device not initialized.")
 	}
 
@@ -94,7 +89,7 @@ func HI_UNF_IR_Enable(bEnable HI_BOOL) (bool, error) {
 		status = 1
 	}
 
-	if err := Ioctl(fd.Fd(), CMD_IR_SET_ENABLE, &status); err != nil {
+	if err := Ioctl(ir.fd.Fd(), CMD_IR_SET_ENABLE, &status); err != nil {
 		return false, err
 	}
 
@@ -148,15 +143,15 @@ Others:         NA
 func HI_UNF_IR_GetValueWithProtocol(u32TimeoutMs HI_U32) (KeyAttr, error) {
 	IrKey := KeyAttr{}
 
-	if fd == nil {
+	if ir.fd == nil {
 		return IrKey, errors.New("IR Device not initialized.")
 	}
 
-	if err := Ioctl(fd.Fd(), CMD_IR_SET_BLOCKTIME, &u32TimeoutMs); err != nil {
+	if err := Ioctl(ir.fd.Fd(), CMD_IR_SET_BLOCKTIME, &u32TimeoutMs); err != nil {
 		return IrKey, err
 	}
 
-	if err := binary.Read(fd, binary.LittleEndian, &IrKey); err != nil {
+	if err := binary.Read(ir.fd, binary.LittleEndian, &IrKey); err != nil {
 		return IrKey, err
 	}
 
@@ -176,7 +171,7 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_IR_SetFetchMode(s32Mode HI_BOOL) (bool, error) {
-	if fd == nil {
+	if ir.fd == nil {
 		return false, errors.New("IR Device not initialized.")
 	}
 
@@ -185,7 +180,7 @@ func HI_UNF_IR_SetFetchMode(s32Mode HI_BOOL) (bool, error) {
 		mode = 1
 	}
 
-	if err := Ioctl(fd.Fd(), CMD_IR_SET_FETCH_METHOD, &mode); err != nil {
+	if err := Ioctl(ir.fd.Fd(), CMD_IR_SET_FETCH_METHOD, &mode); err != nil {
 		return false, err
 	}
 
@@ -233,7 +228,7 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_IR_EnableKeyUp(bEnable HI_BOOL) (bool, error) {
-	if fd == nil {
+	if ir.fd == nil {
 		return false, errors.New("IR Device not initialized.")
 	}
 
@@ -242,7 +237,7 @@ func HI_UNF_IR_EnableKeyUp(bEnable HI_BOOL) (bool, error) {
 		status = 1
 	}
 
-	if err := Ioctl(fd.Fd(), CMD_IR_ENABLE_KEYUP, &status); err != nil {
+	if err := Ioctl(ir.fd.Fd(), CMD_IR_ENABLE_KEYUP, &status); err != nil {
 		return false, err
 	}
 
@@ -262,7 +257,7 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_IR_EnableRepKey(bEnable HI_BOOL) (bool, error) {
-	if fd == nil {
+	if ir.fd == nil {
 		return false, errors.New("IR Device not initialized.")
 	}
 
@@ -271,7 +266,7 @@ func HI_UNF_IR_EnableRepKey(bEnable HI_BOOL) (bool, error) {
 		status = 1
 	}
 
-	if err := Ioctl(fd.Fd(), CMD_IR_ENABLE_REPKEY, &status); err != nil {
+	if err := Ioctl(ir.fd.Fd(), CMD_IR_ENABLE_REPKEY, &status); err != nil {
 		return false, err
 	}
 
@@ -291,7 +286,7 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_IR_SetRepKeyTimeoutAttr(u32TimeoutMs HI_U32) (bool, error) {
-	if fd == nil {
+	if ir.fd == nil {
 		return false, errors.New("IR Device not initialized.")
 	}
 
@@ -299,7 +294,7 @@ func HI_UNF_IR_SetRepKeyTimeoutAttr(u32TimeoutMs HI_U32) (bool, error) {
 		return false, errors.New("The max timeout supported is 65536ms.")
 	}
 
-	if err := Ioctl(fd.Fd(), CMD_IR_SET_REPKEY_TIMEOUT, &u32TimeoutMs); err != nil {
+	if err := Ioctl(ir.fd.Fd(), CMD_IR_SET_REPKEY_TIMEOUT, &u32TimeoutMs); err != nil {
 		return false, err
 	}
 
@@ -335,11 +330,11 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_IR_Reset() (bool, error) {
-	if fd == nil {
+	if ir.fd == nil {
 		return false, errors.New("IR Device not initialized.")
 	}
 
-	if err := Ioctl(fd.Fd(), CMD_IR_RESET, nil); err != nil {
+	if err := Ioctl(ir.fd.Fd(), CMD_IR_RESET, nil); err != nil {
 		return false, err
 	}
 
@@ -363,12 +358,12 @@ func HI_UNF_IR_EnableProtocol(pszProtocolName string) (bool, error) {
 		return false, errors.New("Invalid parameter.")
 	}
 
-	if fd == nil {
+	if ir.fd == nil {
 		return false, errors.New("IR Device not initialized.")
 	}
 
 	bProtocol := []byte(pszProtocolName)
-	if err := Ioctl(fd.Fd(), CMD_IR_SET_PROT_ENABLE, &bProtocol[0]); err != nil {
+	if err := Ioctl(ir.fd.Fd(), CMD_IR_SET_PROT_ENABLE, &bProtocol[0]); err != nil {
 		return false, err
 	}
 
@@ -392,12 +387,12 @@ func HI_UNF_IR_DisableProtocol(pszProtocolName string) (bool, error) {
 		return false, errors.New("Invalid parameter.")
 	}
 
-	if fd == nil {
+	if ir.fd == nil {
 		return false, errors.New("IR Device not initialized.")
 	}
 
 	bProtocol := []byte(pszProtocolName)
-	if err := Ioctl(fd.Fd(), CMD_IR_SET_PROT_DISABLE, &bProtocol[0]); err != nil {
+	if err := Ioctl(ir.fd.Fd(), CMD_IR_SET_PROT_DISABLE, &bProtocol[0]); err != nil {
 		return false, err
 	}
 
@@ -421,12 +416,12 @@ func HI_UNF_IR_GetProtocolEnabled(pszProtocolName string) (bool, error) {
 		return false, errors.New("Invalid parameter.")
 	}
 
-	if fd == nil {
+	if ir.fd == nil {
 		return false, errors.New("IR Device not initialized.")
 	}
 
 	bProtocol := []byte(pszProtocolName)
-	if err := Ioctl(fd.Fd(), CMD_IR_GET_PROT_ENABLED, &bProtocol[0]); err != nil {
+	if err := Ioctl(ir.fd.Fd(), CMD_IR_GET_PROT_ENABLED, &bProtocol[0]); err != nil {
 		return false, err
 	}
 
