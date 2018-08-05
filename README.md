@@ -75,7 +75,7 @@ You can use `go get -u` to update the package.
 - [ ] HDMI
 - [ ] HDMIRX
 - [ ] HIGO
-- [-] I2C
+- [ ] I2C
 - [X] IR
 - [ ] JPEG
 - [ ] JPGE
