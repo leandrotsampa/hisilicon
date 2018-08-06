@@ -111,17 +111,17 @@ type SCI_RESET_S struct {
 }
 
 type SCI_ATR_S struct {
-	Port    HI_UNF_SCI_PORT_E
-	AttrBuf *HI_U8
-	BufSize HI_U32
-	DataLen HI_U8
+	Port       HI_UNF_SCI_PORT_E
+	AtrBuf     *HI_U8
+	AtrBufSize HI_U32
+	DataLen    HI_U8
 }
 
 type SCI_ATR_COMPAT_S struct {
-	Port    HI_UNF_SCI_PORT_E
-	AttrBuf HI_U32
-	BufSize HI_U32
-	DataLen HI_U8
+	Port       HI_UNF_SCI_PORT_E
+	AtrBuf     HI_U32
+	AtrBufSize HI_U32
+	DataLen    HI_U8
 }
 
 type SCI_STATUS_S struct {
@@ -131,7 +131,7 @@ type SCI_STATUS_S struct {
 
 type SCI_DATA_S struct {
 	Port      HI_UNF_SCI_PORT_E
-	pDataBuf  *HI_U8
+	DataBuf   *HI_U8
 	BufSize   HI_U32
 	DataLen   HI_U32
 	TimeoutMs HI_U32
@@ -139,7 +139,7 @@ type SCI_DATA_S struct {
 
 type SCI_DATA_COMPAT_S struct {
 	Port      HI_UNF_SCI_PORT_E
-	pDataBuf  HI_U32
+	DataBuf   HI_U32
 	BufSize   HI_U32
 	DataLen   HI_U32
 	TimeoutMs HI_U32

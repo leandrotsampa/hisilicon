@@ -89,7 +89,7 @@ You can use `go get -u` to update the package.
 - [ ] PQ
 - [ ] PVR
 - [ ] PWM
-- [ ] SCI
+- [X] SCI
 - [ ] SPI
 - [ ] SYNC
 - [ ] TDE
