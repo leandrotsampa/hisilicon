@@ -8,6 +8,19 @@ import (
 
 var ir = HiDevice{fd: nil, InUse: 0}
 
+/** Internal Function for IR IOCTL Calls **/
+func irCall(op uintptr, arg interface{}) (bool, error) {
+	if ir.fd == nil {
+		return false, errors.New("IR Device not initialized.")
+	}
+
+	if err := Ioctl(ir.fd.Fd(), op, arg); err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 /*************************************************************
 Function:       HI_UNF_IR_Init
 Description:    open ir device,and do the basical initialization
@@ -80,15 +93,11 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_IR_Enable(bEnable HI_BOOL) (bool, error) {
-	if ir.fd == nil {
-		return false, errors.New("IR Device not initialized.")
+	if bEnable != HI_FALSE && bEnable != HI_TRUE {
+		return false, errors.New("The parameter is invalid.")
 	}
 
-	if err := Ioctl(ir.fd.Fd(), CMD_IR_SET_ENABLE, &bEnable); err != nil {
-		return false, err
-	}
-
-	return true, nil
+	return irCall(CMD_IR_SET_ENABLE, &bEnable)
 }
 
 /*************************************************************
@@ -138,11 +147,7 @@ Others:         NA
 func HI_UNF_IR_GetValueWithProtocol(u32TimeoutMs HI_U32) (KeyAttr, error) {
 	IrKey := KeyAttr{}
 
-	if ir.fd == nil {
-		return IrKey, errors.New("IR Device not initialized.")
-	}
-
-	if err := Ioctl(ir.fd.Fd(), CMD_IR_SET_BLOCKTIME, &u32TimeoutMs); err != nil {
+	if _, err := irCall(CMD_IR_SET_BLOCKTIME, &u32TimeoutMs); err != nil {
 		return IrKey, err
 	}
 
@@ -159,22 +164,18 @@ Description:    set key fetch mode or symbol mode.
 Calls:
 Data Accessed:
 Data Updated:   NA
-Input:          mode: true-> key mode. false-> raw symbol mode.
+Input:          bMode: true-> key mode. false-> raw symbol mode.
 Output:
 Return:         bool
                 error
 Others:         NA
 *************************************************************/
-func HI_UNF_IR_SetFetchMode(mode HI_BOOL) (bool, error) {
-	if ir.fd == nil {
-		return false, errors.New("IR Device not initialized.")
+func HI_UNF_IR_SetFetchMode(bMode HI_BOOL) (bool, error) {
+	if bMode != HI_FALSE && bMode != HI_TRUE {
+		return false, errors.New("The parameter is invalid.")
 	}
 
-	if err := Ioctl(ir.fd.Fd(), CMD_IR_SET_FETCH_METHOD, &mode); err != nil {
-		return false, err
-	}
-
-	return true, nil
+	return irCall(CMD_IR_SET_FETCH_METHOD, &bMode)
 }
 
 /*************************************************************
@@ -218,15 +219,11 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_IR_EnableKeyUp(bEnable HI_BOOL) (bool, error) {
-	if ir.fd == nil {
-		return false, errors.New("IR Device not initialized.")
+	if bEnable != HI_FALSE && bEnable != HI_TRUE {
+		return false, errors.New("The parameter is invalid.")
 	}
 
-	if err := Ioctl(ir.fd.Fd(), CMD_IR_ENABLE_KEYUP, &bEnable); err != nil {
-		return false, err
-	}
-
-	return true, nil
+	return irCall(CMD_IR_ENABLE_KEYUP, &bEnable)
 }
 
 /*************************************************************
@@ -242,15 +239,11 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_IR_EnableRepKey(bEnable HI_BOOL) (bool, error) {
-	if ir.fd == nil {
-		return false, errors.New("IR Device not initialized.")
+	if bEnable != HI_FALSE && bEnable != HI_TRUE {
+		return false, errors.New("The parameter is invalid.")
 	}
 
-	if err := Ioctl(ir.fd.Fd(), CMD_IR_ENABLE_REPKEY, &bEnable); err != nil {
-		return false, err
-	}
-
-	return true, nil
+	return irCall(CMD_IR_ENABLE_REPKEY, &bEnable)
 }
 
 /*************************************************************
@@ -266,19 +259,11 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_IR_SetRepKeyTimeoutAttr(u32TimeoutMs HI_U32) (bool, error) {
-	if ir.fd == nil {
-		return false, errors.New("IR Device not initialized.")
-	}
-
 	if u32TimeoutMs > 65536 {
 		return false, errors.New("The max timeout supported is 65536ms.")
 	}
 
-	if err := Ioctl(ir.fd.Fd(), CMD_IR_SET_REPKEY_TIMEOUT, &u32TimeoutMs); err != nil {
-		return false, err
-	}
-
-	return true, nil
+	return irCall(CMD_IR_SET_REPKEY_TIMEOUT, &u32TimeoutMs)
 }
 
 /*************************************************************
@@ -310,15 +295,7 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_IR_Reset() (bool, error) {
-	if ir.fd == nil {
-		return false, errors.New("IR Device not initialized.")
-	}
-
-	if err := Ioctl(ir.fd.Fd(), CMD_IR_RESET, nil); err != nil {
-		return false, err
-	}
-
-	return true, nil
+	return irCall(CMD_IR_RESET, nil)
 }
 
 /*************************************************************
@@ -338,16 +315,8 @@ func HI_UNF_IR_EnableProtocol(pszProtocolName string) (bool, error) {
 		return false, errors.New("Invalid parameter.")
 	}
 
-	if ir.fd == nil {
-		return false, errors.New("IR Device not initialized.")
-	}
-
 	bProtocol := []byte(pszProtocolName)
-	if err := Ioctl(ir.fd.Fd(), CMD_IR_SET_PROT_ENABLE, &bProtocol[0]); err != nil {
-		return false, err
-	}
-
-	return true, nil
+	return irCall(CMD_IR_SET_PROT_ENABLE, &bProtocol[0])
 }
 
 /*************************************************************
@@ -367,16 +336,8 @@ func HI_UNF_IR_DisableProtocol(pszProtocolName string) (bool, error) {
 		return false, errors.New("Invalid parameter.")
 	}
 
-	if ir.fd == nil {
-		return false, errors.New("IR Device not initialized.")
-	}
-
 	bProtocol := []byte(pszProtocolName)
-	if err := Ioctl(ir.fd.Fd(), CMD_IR_SET_PROT_DISABLE, &bProtocol[0]); err != nil {
-		return false, err
-	}
-
-	return true, nil
+	return irCall(CMD_IR_SET_PROT_DISABLE, &bProtocol[0])
 }
 
 /*************************************************************
@@ -396,12 +357,8 @@ func HI_UNF_IR_GetProtocolEnabled(pszProtocolName string) (bool, error) {
 		return false, errors.New("Invalid parameter.")
 	}
 
-	if ir.fd == nil {
-		return false, errors.New("IR Device not initialized.")
-	}
-
 	bProtocol := []byte(pszProtocolName)
-	if err := Ioctl(ir.fd.Fd(), CMD_IR_GET_PROT_ENABLED, &bProtocol[0]); err != nil {
+	if _, err := irCall(CMD_IR_GET_PROT_ENABLED, &bProtocol[0]); err != nil {
 		return false, err
 	}
 

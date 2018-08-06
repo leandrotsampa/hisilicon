@@ -7,6 +7,19 @@ import (
 
 var sci = HiDevice{fd: nil}
 
+/** Internal Function for SCI IOCTL Calls **/
+func sciCall(op uintptr, arg interface{}) (bool, error) {
+	if sci.fd == nil {
+		return false, errors.New("SCI Device not initialized.")
+	}
+
+	if err := Ioctl(sci.fd.Fd(), op, arg); err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 /*************************************************************
 Function:       HI_UNF_SCI_Init
 Description:    open sci device,and do the basical initialization
@@ -75,10 +88,6 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_SCI_Open(config SCI_OPEN_S) (bool, error) {
-	if sci.fd == nil {
-		return false, errors.New("SCI Device not initialized.")
-	}
-
 	if config.Port >= HI_UNF_SCI_PORT_BUTT {
 		return false, errors.New("SCI Port is invalid.")
 	}
@@ -95,11 +104,7 @@ func HI_UNF_SCI_Open(config SCI_OPEN_S) (bool, error) {
 		return false, errors.New("SCI Frequency is invalid.")
 	}
 
-	if err := Ioctl(sci.fd.Fd(), CMD_SCI_OPEN, &config); err != nil {
-		return false, err
-	}
-
-	return true, nil
+	return sciCall(CMD_SCI_OPEN, &config)
 }
 
 /*************************************************************
@@ -115,19 +120,11 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_SCI_Close(port HI_UNF_SCI_PORT_E) (bool, error) {
-	if sci.fd == nil {
-		return false, errors.New("SCI Device not initialized.")
-	}
-
 	if port >= HI_UNF_SCI_PORT_BUTT {
 		return false, errors.New("SCI Port is invalid.")
 	}
 
-	if err := Ioctl(sci.fd.Fd(), CMD_SCI_CLOSE, &port); err != nil {
-		return false, err
-	}
-
-	return true, nil
+	return sciCall(CMD_SCI_CLOSE, &port)
 }
 
 /*************************************************************
@@ -143,10 +140,6 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_SCI_ResetCard(reset SCI_RESET_S) (bool, error) {
-	if sci.fd == nil {
-		return false, errors.New("SCI Device not initialized.")
-	}
-
 	if reset.Port >= HI_UNF_SCI_PORT_BUTT {
 		return false, errors.New("SCI Port is invalid.")
 	}
@@ -155,11 +148,7 @@ func HI_UNF_SCI_ResetCard(reset SCI_RESET_S) (bool, error) {
 		return false, errors.New("SCI WarmReset is invalid.")
 	}
 
-	if err := Ioctl(sci.fd.Fd(), CMD_SCI_RESET, &reset); err != nil {
-		return false, err
-	}
-
-	return true, nil
+	return sciCall(CMD_SCI_RESET, &reset)
 }
 
 /*************************************************************
@@ -175,17 +164,9 @@ Return:         bool
 Others:         NA
 *************************************************************/
 func HI_UNF_SCI_DeactiveCard(port HI_UNF_SCI_PORT_E) (bool, error) {
-	if sci.fd == nil {
-		return false, errors.New("SCI Device not initialized.")
-	}
-
 	if port >= HI_UNF_SCI_PORT_BUTT {
 		return false, errors.New("SCI Port is invalid.")
 	}
 
-	if err := Ioctl(sci.fd.Fd(), CMD_SCI_DEACTIVE, &port); err != nil {
-		return false, err
-	}
-
-	return true, nil
+	return sciCall(CMD_SCI_DEACTIVE, &port)
 }
