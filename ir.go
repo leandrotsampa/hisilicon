@@ -84,12 +84,7 @@ func HI_UNF_IR_Enable(bEnable HI_BOOL) (bool, error) {
 		return false, errors.New("IR Device not initialized.")
 	}
 
-	var status int32
-	if bEnable {
-		status = 1
-	}
-
-	if err := Ioctl(ir.fd.Fd(), CMD_IR_SET_ENABLE, &status); err != nil {
+	if err := Ioctl(ir.fd.Fd(), CMD_IR_SET_ENABLE, &bEnable); err != nil {
 		return false, err
 	}
 
@@ -170,14 +165,9 @@ Return:         bool
                 error
 Others:         NA
 *************************************************************/
-func HI_UNF_IR_SetFetchMode(s32Mode HI_BOOL) (bool, error) {
+func HI_UNF_IR_SetFetchMode(mode HI_BOOL) (bool, error) {
 	if ir.fd == nil {
 		return false, errors.New("IR Device not initialized.")
-	}
-
-	var mode int32
-	if s32Mode {
-		mode = 1
 	}
 
 	if err := Ioctl(ir.fd.Fd(), CMD_IR_SET_FETCH_METHOD, &mode); err != nil {
@@ -232,12 +222,7 @@ func HI_UNF_IR_EnableKeyUp(bEnable HI_BOOL) (bool, error) {
 		return false, errors.New("IR Device not initialized.")
 	}
 
-	var status int32
-	if bEnable {
-		status = 1
-	}
-
-	if err := Ioctl(ir.fd.Fd(), CMD_IR_ENABLE_KEYUP, &status); err != nil {
+	if err := Ioctl(ir.fd.Fd(), CMD_IR_ENABLE_KEYUP, &bEnable); err != nil {
 		return false, err
 	}
 
@@ -261,12 +246,7 @@ func HI_UNF_IR_EnableRepKey(bEnable HI_BOOL) (bool, error) {
 		return false, errors.New("IR Device not initialized.")
 	}
 
-	var status int32
-	if bEnable {
-		status = 1
-	}
-
-	if err := Ioctl(ir.fd.Fd(), CMD_IR_ENABLE_REPKEY, &status); err != nil {
+	if err := Ioctl(ir.fd.Fd(), CMD_IR_ENABLE_REPKEY, &bEnable); err != nil {
 		return false, err
 	}
 

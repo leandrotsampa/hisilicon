@@ -35,11 +35,11 @@ type HI_HANDLE = uint32
 type HI_PHYS_ADDR_T = uint32
 type HI_VIRT_ADDR_T = uint32
 
-type HI_BOOL = bool
+type HI_BOOL = int32
 
 const (
-	HI_FALSE HI_BOOL = false
-	HI_TRUE  HI_BOOL = true
+	HI_FALSE HI_BOOL = iota
+	HI_TRUE  HI_BOOL = iota
 )
 
 /* Errors Types */
