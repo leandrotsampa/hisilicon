@@ -38,6 +38,7 @@ func HI_UNF_SCI_Init() (bool, error) {
 	defer sci.mu.Unlock()
 
 	if sci.fd != nil {
+		sci.InUse++
 		return true, nil
 	}
 
@@ -66,6 +67,9 @@ func HI_UNF_SCI_DeInit() (bool, error) {
 	defer sci.mu.Unlock()
 
 	if sci.fd == nil {
+		return true, nil
+	} else if sci.InUse > 0 {
+		sci.InUse--
 		return true, nil
 	}
 

@@ -3,7 +3,6 @@ package hisilicon
 import (
 	"os"
 	"sync"
-	"unsafe"
 )
 
 /* Global Types */
@@ -27,7 +26,7 @@ type HI_PCHAR = string
 type HI_FLOAT = float32
 type HI_DOUBLE = float64
 
-type HI_VOID = unsafe.Pointer
+type HI_VOID = uintptr
 
 type HI_SIZE_T = uint64
 type HI_LENGTH_T = uint64
