@@ -4,11 +4,80 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
+	"unsafe"
 )
 
-var sci = HiDevice{fd: nil}
+var (
+	sci = HiDevice{name: "hi_sci", fd: nil, InUse: 0}
+
+	/** Ioctl Definitions **/
+	CMD_SCI_OPEN                uintptr
+	CMD_SCI_CLOSE               uintptr
+	CMD_SCI_RESET               uintptr
+	CMD_SCI_DEACTIVE            uintptr
+	CMD_SCI_GET_ATR             uintptr
+	CMD_SCI_COMPAT_GET_ATR      uintptr
+	CMD_SCI_GET_STATUS          uintptr
+	CMD_SCI_CONF_VCC            uintptr
+	CMD_SCI_CONF_DETECT         uintptr
+	CMD_SCI_CONF_MODE           uintptr
+	CMD_SCI_SEND_DATA           uintptr
+	CMD_SCI_COMPAT_SEND_DATA    uintptr
+	CMD_SCI_RECEIVE_DATA        uintptr
+	CMD_SCI_COMPAT_RECEIVE_DATA uintptr
+	CMD_SCI_SWITCH              uintptr
+	CMD_SCI_SET_BAUD            uintptr
+	CMD_SCI_SET_CHGUARD         uintptr
+	CMD_SCI_SEND_PPS_DATA       uintptr
+	CMD_SCI_GET_PPS_DATA        uintptr
+	CMD_SCI_GET_PARAM           uintptr
+	CMD_SCI_SET_CHARTIMEOUT     uintptr
+	CMD_SCI_SET_BLOCKTIMEOUT    uintptr
+	CMD_SCI_SET_TXRETRY         uintptr
+)
 
 /** Internal Function for SCI IOCTL Calls **/
+func sciLoadIoctl() error {
+	var id uint32
+	var err error
+
+	if sci.fd != nil {
+		return nil
+	} else if _, err = HI_MODULE_Init(); err != nil {
+		return err
+	} else if id, err = HI_MODULE_GetModuleID(strings.ToUpper(sci.name)); err != nil {
+		return err
+	}
+
+	CMD_SCI_OPEN = IoW(uintptr(id), 0x1, unsafe.Sizeof(SCI_OPEN_S{}))
+	CMD_SCI_CLOSE = IoW(uintptr(id), 0x2, unsafe.Sizeof(HI_UNF_SCI_PORT_E(0)))
+	CMD_SCI_RESET = IoW(uintptr(id), 0x3, unsafe.Sizeof(SCI_RESET_S{}))
+	CMD_SCI_DEACTIVE = IoW(uintptr(id), 0x4, unsafe.Sizeof(HI_UNF_SCI_PORT_E(0)))
+	CMD_SCI_GET_ATR = IoRW(uintptr(id), 0x5, unsafe.Sizeof(SCI_ATR_S{}))
+	CMD_SCI_COMPAT_GET_ATR = IoRW(uintptr(id), 0x5, unsafe.Sizeof(SCI_ATR_COMPAT_S{}))
+	CMD_SCI_GET_STATUS = IoRW(uintptr(id), 0x6, unsafe.Sizeof(SCI_STATUS_S{}))
+	CMD_SCI_CONF_VCC = IoW(uintptr(id), 0x7, unsafe.Sizeof(SCI_LEVEL_S{}))
+	CMD_SCI_CONF_DETECT = IoW(uintptr(id), 0x8, unsafe.Sizeof(SCI_LEVEL_S{}))
+	CMD_SCI_CONF_MODE = IoW(uintptr(id), 0x9, unsafe.Sizeof(SCI_IO_OUTPUTTYPE_S{}))
+	CMD_SCI_SEND_DATA = IoRW(uintptr(id), 0xa, unsafe.Sizeof(SCI_DATA_S{}))
+	CMD_SCI_COMPAT_SEND_DATA = IoRW(uintptr(id), 0xa, unsafe.Sizeof(SCI_DATA_COMPAT_S{}))
+	CMD_SCI_RECEIVE_DATA = IoRW(uintptr(id), 0xb, unsafe.Sizeof(SCI_DATA_S{}))
+	CMD_SCI_COMPAT_RECEIVE_DATA = IoRW(uintptr(id), 0xb, unsafe.Sizeof(SCI_DATA_COMPAT_S{}))
+	CMD_SCI_SWITCH = IoW(uintptr(id), 0xc, unsafe.Sizeof(SCI_OPEN_S{}))
+	CMD_SCI_SET_BAUD = IoW(uintptr(id), 0xd, unsafe.Sizeof(SCI_EXT_BAUD_S{}))
+	CMD_SCI_SET_CHGUARD = IoW(uintptr(id), 0xe, unsafe.Sizeof(SCI_ADD_GUARD_S{}))
+	CMD_SCI_SEND_PPS_DATA = IoW(uintptr(id), 0xF, unsafe.Sizeof(SCI_PPS_S{}))
+	CMD_SCI_GET_PPS_DATA = IoRW(uintptr(id), 0x10, unsafe.Sizeof(SCI_PPS_S{}))
+	CMD_SCI_GET_PARAM = IoRW(uintptr(id), 0x11, unsafe.Sizeof(HI_UNF_SCI_PARAMS_S{}))
+	CMD_SCI_SET_CHARTIMEOUT = IoW(uintptr(id), 0x12, unsafe.Sizeof(SCI_CHARTIMEOUT_S{}))
+	CMD_SCI_SET_BLOCKTIMEOUT = IoW(uintptr(id), 0x13, unsafe.Sizeof(SCI_BLOCKTIMEOUT_S{}))
+	CMD_SCI_SET_TXRETRY = IoW(uintptr(id), 0x14, unsafe.Sizeof(SCI_TXRETRY_S{}))
+
+	HI_MODULE_DeInit()
+	return nil
+}
+
 func sciCall(op uintptr, arg interface{}) (bool, error) {
 	if sci.fd == nil {
 		return false, errors.New("SCI Device not initialized.")
@@ -43,7 +112,9 @@ func HI_UNF_SCI_Init() (bool, error) {
 	}
 
 	var err error
-	if sci.fd, err = os.OpenFile("/dev/hi_sci", os.O_RDWR, 0); err != nil {
+	if err = sciLoadIoctl(); err != nil {
+		return false, err
+	} else if sci.fd, err = os.OpenFile("/dev/"+sci.name, os.O_RDWR, 0); err != nil {
 		return false, err
 	}
 

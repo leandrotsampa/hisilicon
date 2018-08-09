@@ -1,37 +1,5 @@
 package hisilicon
 
-import (
-	"unsafe"
-)
-
-/* Ioctl Definitions */
-const HI_ID_IR uintptr = 0x51
-const PROTOCOL_NAME_SZ int32 = 32
-
-var (
-	/* 1:check keyup */
-	CMD_IR_ENABLE_KEYUP = IoW(HI_ID_IR, 0x1, unsafe.Sizeof(int32(0)))
-
-	/* 1:check repkey, 0:hardware behave */
-	CMD_IR_ENABLE_REPKEY      = IoW(HI_ID_IR, 0x2, unsafe.Sizeof(int32(0)))
-	CMD_IR_SET_REPKEY_TIMEOUT = IoW(HI_ID_IR, 0x3, unsafe.Sizeof(int32(0)))
-
-	/* 1:enable ir, 0:disable ir */
-	CMD_IR_SET_ENABLE    = IoW(HI_ID_IR, 0x4, unsafe.Sizeof(int32(0)))
-	CMD_IR_RESET         = Io(HI_ID_IR, 0x5)
-	CMD_IR_SET_BLOCKTIME = IoW(HI_ID_IR, 0x6, unsafe.Sizeof(int32(0)))
-	CMD_IR_SET_FORMAT    = IoW(HI_ID_IR, 0x7, unsafe.Sizeof(int32(0)))
-	CMD_IR_SET_BUF       = IoW(HI_ID_IR, 0x8, unsafe.Sizeof(int32(0)))
-
-	/* raw symbol fetch(1) or key fetch(0) */
-	CMD_IR_SET_FETCH_METHOD = IoW(HI_ID_IR, 0x9, unsafe.Sizeof(int32(0)))
-
-	/* enable or disalbe a protocol */
-	CMD_IR_SET_PROT_ENABLE  = IoW(HI_ID_IR, 0xa, unsafe.Sizeof(int32(0)))
-	CMD_IR_SET_PROT_DISABLE = IoW(HI_ID_IR, 0xb, unsafe.Sizeof(int32(0)))
-	CMD_IR_GET_PROT_ENABLED = IoRW(HI_ID_IR, 0xc, unsafe.Sizeof(int32(0)))
-)
-
 /* Structs Definitions */
 type HI_UNF_KEY_STATUS_E int32
 
@@ -81,7 +49,7 @@ type KeyAttr struct {
 	 * or symbol value under symbol mode
 	 */
 	Lower        uint64
-	ProtocolName [PROTOCOL_NAME_SZ]byte
+	ProtocolName [32]byte
 	/* indentify key status. */
 	StatusKey HI_UNF_KEY_STATUS_E
 }

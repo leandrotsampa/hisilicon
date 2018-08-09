@@ -709,6 +709,7 @@ const (
 )
 
 type HiDevice struct {
+	name  string
 	mu    sync.Mutex
 	fd    *os.File
 	InUse int

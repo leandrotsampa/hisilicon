@@ -1,36 +1,5 @@
 package hisilicon
 
-import "unsafe"
-
-/* Ioctl Definitions */
-const HI_ID_SCI uintptr = 0x54
-
-var (
-	CMD_SCI_OPEN                = IoW(HI_ID_SCI, 0x1, unsafe.Sizeof(SCI_OPEN_S{}))
-	CMD_SCI_CLOSE               = IoW(HI_ID_SCI, 0x2, unsafe.Sizeof(HI_UNF_SCI_PORT_E(0)))
-	CMD_SCI_RESET               = IoW(HI_ID_SCI, 0x3, unsafe.Sizeof(SCI_RESET_S{}))
-	CMD_SCI_DEACTIVE            = IoW(HI_ID_SCI, 0x4, unsafe.Sizeof(HI_UNF_SCI_PORT_E(0)))
-	CMD_SCI_GET_ATR             = IoRW(HI_ID_SCI, 0x5, unsafe.Sizeof(SCI_ATR_S{}))
-	CMD_SCI_COMPAT_GET_ATR      = IoRW(HI_ID_SCI, 0x5, unsafe.Sizeof(SCI_ATR_COMPAT_S{}))
-	CMD_SCI_GET_STATUS          = IoRW(HI_ID_SCI, 0x6, unsafe.Sizeof(SCI_STATUS_S{}))
-	CMD_SCI_CONF_VCC            = IoW(HI_ID_SCI, 0x7, unsafe.Sizeof(SCI_LEVEL_S{}))
-	CMD_SCI_CONF_DETECT         = IoW(HI_ID_SCI, 0x8, unsafe.Sizeof(SCI_LEVEL_S{}))
-	CMD_SCI_CONF_MODE           = IoW(HI_ID_SCI, 0x9, unsafe.Sizeof(SCI_IO_OUTPUTTYPE_S{}))
-	CMD_SCI_SEND_DATA           = IoRW(HI_ID_SCI, 0xa, unsafe.Sizeof(SCI_DATA_S{}))
-	CMD_SCI_COMPAT_SEND_DATA    = IoRW(HI_ID_SCI, 0xa, unsafe.Sizeof(SCI_DATA_COMPAT_S{}))
-	CMD_SCI_RECEIVE_DATA        = IoRW(HI_ID_SCI, 0xb, unsafe.Sizeof(SCI_DATA_S{}))
-	CMD_SCI_COMPAT_RECEIVE_DATA = IoRW(HI_ID_SCI, 0xb, unsafe.Sizeof(SCI_DATA_COMPAT_S{}))
-	CMD_SCI_SWITCH              = IoW(HI_ID_SCI, 0xc, unsafe.Sizeof(SCI_OPEN_S{}))
-	CMD_SCI_SET_BAUD            = IoW(HI_ID_SCI, 0xd, unsafe.Sizeof(SCI_EXT_BAUD_S{}))
-	CMD_SCI_SET_CHGUARD         = IoW(HI_ID_SCI, 0xe, unsafe.Sizeof(SCI_ADD_GUARD_S{}))
-	CMD_SCI_SEND_PPS_DATA       = IoW(HI_ID_SCI, 0xF, unsafe.Sizeof(SCI_PPS_S{}))
-	CMD_SCI_GET_PPS_DATA        = IoRW(HI_ID_SCI, 0x10, unsafe.Sizeof(SCI_PPS_S{}))
-	CMD_SCI_GET_PARAM           = IoRW(HI_ID_SCI, 0x11, unsafe.Sizeof(HI_UNF_SCI_PARAMS_S{}))
-	CMD_SCI_SET_CHARTIMEOUT     = IoW(HI_ID_SCI, 0x12, unsafe.Sizeof(SCI_CHARTIMEOUT_S{}))
-	CMD_SCI_SET_BLOCKTIMEOUT    = IoW(HI_ID_SCI, 0x13, unsafe.Sizeof(SCI_BLOCKTIMEOUT_S{}))
-	CMD_SCI_SET_TXRETRY         = IoW(HI_ID_SCI, 0x14, unsafe.Sizeof(SCI_TXRETRY_S{}))
-)
-
 /* Structs Definitions */
 /** Output configuration of the smart card interface clock (SCICLK) pin **/
 type HI_UNF_SCI_MODE_E int32

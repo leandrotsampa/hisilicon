@@ -4,11 +4,67 @@ import (
 	"encoding/binary"
 	"errors"
 	"os"
+	"strings"
+	"unsafe"
 )
 
-var ir = HiDevice{fd: nil, InUse: 0}
+var (
+	ir = HiDevice{name: "hi_ir", fd: nil, InUse: 0}
+
+	/** Ioctl Definitions **/
+	/* 1:check keyup */
+	CMD_IR_ENABLE_KEYUP uintptr
+
+	/* 1:check repkey, 0:hardware behave */
+	CMD_IR_ENABLE_REPKEY      uintptr
+	CMD_IR_SET_REPKEY_TIMEOUT uintptr
+
+	/* 1:enable ir, 0:disable ir */
+	CMD_IR_SET_ENABLE    uintptr
+	CMD_IR_RESET         uintptr
+	CMD_IR_SET_BLOCKTIME uintptr
+	CMD_IR_SET_FORMAT    uintptr
+	CMD_IR_SET_BUF       uintptr
+
+	/* raw symbol fetch(1) or key fetch(0) */
+	CMD_IR_SET_FETCH_METHOD uintptr
+
+	/* enable or disalbe a protocol */
+	CMD_IR_SET_PROT_ENABLE  uintptr
+	CMD_IR_SET_PROT_DISABLE uintptr
+	CMD_IR_GET_PROT_ENABLED uintptr
+)
 
 /** Internal Function for IR IOCTL Calls **/
+func irLoadIoctl() error {
+	var id uint32
+	var err error
+
+	if ir.fd != nil {
+		return nil
+	} else if _, err = HI_MODULE_Init(); err != nil {
+		return err
+	} else if id, err = HI_MODULE_GetModuleID(strings.ToUpper(ir.name)); err != nil {
+		return err
+	}
+
+	CMD_IR_ENABLE_KEYUP = IoW(uintptr(id), 0x1, unsafe.Sizeof(int32(0)))
+	CMD_IR_ENABLE_REPKEY = IoW(uintptr(id), 0x2, unsafe.Sizeof(int32(0)))
+	CMD_IR_SET_REPKEY_TIMEOUT = IoW(uintptr(id), 0x3, unsafe.Sizeof(int32(0)))
+	CMD_IR_SET_ENABLE = IoW(uintptr(id), 0x4, unsafe.Sizeof(int32(0)))
+	CMD_IR_RESET = Io(uintptr(id), 0x5)
+	CMD_IR_SET_BLOCKTIME = IoW(uintptr(id), 0x6, unsafe.Sizeof(int32(0)))
+	CMD_IR_SET_FORMAT = IoW(uintptr(id), 0x7, unsafe.Sizeof(int32(0)))
+	CMD_IR_SET_BUF = IoW(uintptr(id), 0x8, unsafe.Sizeof(int32(0)))
+	CMD_IR_SET_FETCH_METHOD = IoW(uintptr(id), 0x9, unsafe.Sizeof(int32(0)))
+	CMD_IR_SET_PROT_ENABLE = IoW(uintptr(id), 0xa, unsafe.Sizeof(int32(0)))
+	CMD_IR_SET_PROT_DISABLE = IoW(uintptr(id), 0xb, unsafe.Sizeof(int32(0)))
+	CMD_IR_GET_PROT_ENABLED = IoRW(uintptr(id), 0xc, unsafe.Sizeof(int32(0)))
+
+	HI_MODULE_DeInit()
+	return nil
+}
+
 func irCall(op uintptr, arg interface{}) (bool, error) {
 	if ir.fd == nil {
 		return false, errors.New("IR Device not initialized.")
@@ -43,7 +99,9 @@ func HI_UNF_IR_Init() (bool, error) {
 	}
 
 	var err error
-	if ir.fd, err = os.OpenFile("/dev/hi_ir", os.O_RDWR, 0); err != nil {
+	if err = irLoadIoctl(); err != nil {
+		return false, err
+	} else if ir.fd, err = os.OpenFile("/dev/"+ir.name, os.O_RDWR, 0); err != nil {
 		return false, err
 	}
 
