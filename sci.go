@@ -2,6 +2,7 @@ package hisilicon
 
 import (
 	"errors"
+	"fmt"
 	"os"
 )
 
@@ -251,7 +252,15 @@ func HI_UNF_SCI_Send(data *SCI_DATA_S) (bool, error) {
 		return false, errors.New("The current state can't execute send operation.")
 	}
 
-	return sciCall(CMD_SCI_SEND_DATA, data)
+	if _, err := sciCall(CMD_SCI_SEND_DATA, data); err != nil {
+		return false, err
+	}
+
+	if data.DataLen < data.BufSize {
+		return false, errors.New(fmt.Sprintf("Not all data is writed, requested to write size %d and writed %d.", data.BufSize, data.DataLen))
+	}
+
+	return true, nil
 }
 
 /*************************************************************
@@ -289,7 +298,7 @@ func HI_UNF_SCI_Receive(data *SCI_DATA_S) (bool, error) {
 	if _, err := sciCall(CMD_SCI_RECEIVE_DATA, data); err != nil {
 		return false, err
 	} else if data.DataLen < data.BufSize {
-		return false, errors.New("The received size is wrong.")
+		return false, errors.New(fmt.Sprintf("The received size is wrong, received %d expected %d.", data.DataLen, data.BufSize))
 	}
 
 	return true, nil
