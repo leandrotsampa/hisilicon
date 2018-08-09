@@ -18,7 +18,7 @@ func main() {
 	if _, err := hiapi.HI_UNF_IR_Init(); err != nil {
 		panic(err)
 	}
-	if _, err := hiapi.HI_UNF_IR_EnableRepKey(true); err != nil {
+	if _, err := hiapi.HI_UNF_IR_EnableRepKey(hiapi.HI_TRUE); err != nil {
 		panic(err)
 	}
 
