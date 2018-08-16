@@ -6,17 +6,17 @@ type HI_UNF_SCI_MODE_E int32
 
 const (
 	HI_UNF_SCI_MODE_CMOS HI_UNF_SCI_MODE_E = iota /* Complementary metal-oxide semiconductor (CMOS) output */
-	HI_UNF_SCI_MODE_OD   HI_UNF_SCI_MODE_E = iota /* Open drain (OD) output */
-	HI_UNF_SCI_MODE_BUTT HI_UNF_SCI_MODE_E = iota
+	HI_UNF_SCI_MODE_OD                            /* Open drain (OD) output */
+	HI_UNF_SCI_MODE_BUTT
 )
 
 /** SCI Port **/
 type HI_UNF_SCI_PORT_E int32
 
 const (
-	HI_UNF_SCI_PORT0     HI_UNF_SCI_PORT_E = iota /* SCI Port 0 */
-	HI_UNF_SCI_PORT1     HI_UNF_SCI_PORT_E = iota /* SCI Port 1 */
-	HI_UNF_SCI_PORT_BUTT HI_UNF_SCI_PORT_E = iota
+	HI_UNF_SCI_PORT0 HI_UNF_SCI_PORT_E = iota /* SCI Port 0 */
+	HI_UNF_SCI_PORT1                          /* SCI Port 1 */
+	HI_UNF_SCI_PORT_BUTT
 )
 
 /** Status of the SCI Card **/
@@ -24,25 +24,25 @@ type HI_UNF_SCI_STATUS_E int32
 
 const (
 	HI_UNF_SCI_STATUS_UNINIT       HI_UNF_SCI_STATUS_E = iota /* The SCI Card is not initialized. (Reserved status) */
-	HI_UNF_SCI_STATUS_FIRSTINIT    HI_UNF_SCI_STATUS_E = iota /* The SCI Card is being initialized.(Reserved status) */
-	HI_UNF_SCI_STATUS_NOCARD       HI_UNF_SCI_STATUS_E = iota /* There is no SCI Card. */
-	HI_UNF_SCI_STATUS_INACTIVECARD HI_UNF_SCI_STATUS_E = iota /* The SCI Card is not activated (unavailable). */
-	//HI_UNF_SCI_STATUS_CARDFAULT    HI_UNF_SCI_STATUS_E = iota /* The SCI Card is faulty.*/
-	HI_UNF_SCI_STATUS_WAITATR HI_UNF_SCI_STATUS_E = iota /* The SCI Card is waiting for the ATR data. */
-	HI_UNF_SCI_STATUS_READATR HI_UNF_SCI_STATUS_E = iota /* The SCI Card is receiving the ATR data. */
-	HI_UNF_SCI_STATUS_READY   HI_UNF_SCI_STATUS_E = iota /* The SCI Card is available (activated). */
-	HI_UNF_SCI_STATUS_RX      HI_UNF_SCI_STATUS_E = iota /* The SCI Card is busy receiving data. */
-	HI_UNF_SCI_STATUS_TX      HI_UNF_SCI_STATUS_E = iota /* The SCI Card is busy transmitting data. */
+	HI_UNF_SCI_STATUS_FIRSTINIT                               /* The SCI Card is being initialized.(Reserved status) */
+	HI_UNF_SCI_STATUS_NOCARD                                  /* There is no SCI Card. */
+	HI_UNF_SCI_STATUS_INACTIVECARD                            /* The SCI Card is not activated (unavailable). */
+	//HI_UNF_SCI_STATUS_CARDFAULT                             /* The SCI Card is faulty.*/
+	HI_UNF_SCI_STATUS_WAITATR /* The SCI Card is waiting for the ATR data. */
+	HI_UNF_SCI_STATUS_READATR /* The SCI Card is receiving the ATR data. */
+	HI_UNF_SCI_STATUS_READY   /* The SCI Card is available (activated). */
+	HI_UNF_SCI_STATUS_RX      /* The SCI Card is busy receiving data. */
+	HI_UNF_SCI_STATUS_TX      /* The SCI Card is busy transmitting data. */
 )
 
 /** SCI Protocol **/
 type HI_UNF_SCI_PROTOCOL_E int32
 
 const (
-	HI_UNF_SCI_PROTOCOL_T0   HI_UNF_SCI_PROTOCOL_E = iota /* 7816 T0 Protocol */
-	HI_UNF_SCI_PROTOCOL_T1   HI_UNF_SCI_PROTOCOL_E = iota /* 7816 T1 Protocol */
-	HI_UNF_SCI_PROTOCOL_T14  HI_UNF_SCI_PROTOCOL_E = iota /* 7816 T14 Protocol */
-	HI_UNF_SCI_PROTOCOL_BUTT HI_UNF_SCI_PROTOCOL_E = iota
+	HI_UNF_SCI_PROTOCOL_T0  HI_UNF_SCI_PROTOCOL_E = iota /* 7816 T0 Protocol */
+	HI_UNF_SCI_PROTOCOL_T1                               /* 7816 T1 Protocol */
+	HI_UNF_SCI_PROTOCOL_T14                              /* 7816 T14 Protocol */
+	HI_UNF_SCI_PROTOCOL_BUTT
 )
 
 /** SCI Active Level **/
@@ -50,8 +50,8 @@ type HI_UNF_SCI_LEVEL_E int32
 
 const (
 	HI_UNF_SCI_LEVEL_LOW  HI_UNF_SCI_LEVEL_E = iota /* Active Low */
-	HI_UNF_SCI_LEVEL_HIGH HI_UNF_SCI_LEVEL_E = iota /* Active High */
-	HI_UNF_SCI_LEVEL_BUTT HI_UNF_SCI_LEVEL_E = iota
+	HI_UNF_SCI_LEVEL_HIGH                           /* Active High */
+	HI_UNF_SCI_LEVEL_BUTT
 )
 
 /** SCI System Parameters **/
@@ -122,10 +122,10 @@ type SCI_LEVEL_S struct {
 type SCI_IO_E int32
 
 const (
-	SCI_IO_CLK    SCI_IO_E = iota
-	SCI_IO_RESET  SCI_IO_E = iota
-	SCI_IO_VCC_EN SCI_IO_E = iota
-	SCI_IO_BUTT   SCI_IO_E = iota
+	SCI_IO_CLK SCI_IO_E = iota
+	SCI_IO_RESET
+	SCI_IO_VCC_EN
+	SCI_IO_BUTT
 )
 
 type SCI_IO_OUTPUTTYPE_S struct {
