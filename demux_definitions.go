@@ -467,6 +467,44 @@ type DMX_BUF_S struct {
 	Flag    DMX_BUF_FLAG_E
 }
 
+/* Sequence of DMX_IDX_DATA_S 's member can not change, must match the sequence defined by hardware */
+type DMX_IDX_DATA_S struct {
+	u32Chn_Ovflag_IdxType_Flags        HI_U32
+	u32ScType_Byte12AfterSc_OffsetInTs HI_U32
+	u32TsCntLo32                       HI_U32
+	u32TsCntHi8_Byte345AfterSc         HI_U32
+	u32ScCode_Byte678AfterSc           HI_U32
+	u32SrcClk                          HI_U32
+	u32BackPacetNum                    HI_U32 /* Back package number */
+}
+
+type HI_MPI_DMX_PORT_E int32
+
+const (
+	HI_MPI_DMX_PORT_RMX_0 HI_MPI_DMX_PORT_E = iota + 0xa0
+	HI_MPI_DMX_PORT_BUTT
+)
+
+type HI_MPI_RMX_ATTR_S struct {
+	enOutPortId HI_MPI_DMX_PORT_E
+}
+
+type HI_MPI_RMX_PUMP_TYPE_E int32
+
+const (
+	HI_MPI_RMX_PUMP_TYPE_PID HI_MPI_RMX_PUMP_TYPE_E = iota
+	HI_MPI_RMX_PUMP_TYPE_REMAP_PID
+	HI_MPI_RMX_PUMP_TYPE_ALLPASS_PORT
+	HI_MPI_RMX_PUMP_TYPE_BUTT
+)
+
+type HI_MPI_RMX_PUMP_ATTR_S struct {
+	enPumpType  HI_MPI_RMX_PUMP_TYPE_E
+	enInPortId  HI_UNF_DMX_PORT_E
+	u32Pid      HI_U32
+	u32RemapPid HI_U32
+}
+
 type DMX_PoolBuf_Attr_S struct {
 	BufPhyAddr HI_U32
 	BufSize    HI_U32
@@ -711,3 +749,188 @@ type DMX_Compat_SelectDataFlag_S struct {
 //	u32TimeOutMs HI_U32     /* timeout time in MS */
 //}
 //#endif
+
+type DMX_AcqMsg_S struct {
+	hChannel       HI_HANDLE
+	u32AcquireNum  HI_U32
+	u32AcquiredNum HI_U32
+	pstBuf         *HI_UNF_DMX_DATA_S
+	u32TimeOutMs   HI_U32
+}
+
+type DMX_Compat_AcqMsg_S struct {
+	hChannel       HI_HANDLE
+	u32AcquireNum  HI_U32
+	u32AcquiredNum HI_U32
+	pstBuf         HI_U32
+	u32TimeOutMs   HI_U32
+}
+
+type DMX_RelMsg_S struct {
+	hChannel      HI_HANDLE
+	u32ReleaseNum HI_U32
+	pstBuf        *HI_UNF_DMX_DATA_S
+}
+
+type DMX_Compat_RelMsg_S struct {
+	hChannel      HI_HANDLE
+	u32ReleaseNum HI_U32
+	pstBuf        HI_U32
+}
+
+type DMX_NewPcr_S struct {
+	u32DmxId HI_U32
+	u32PcrId HI_U32
+}
+
+type DMX_PcrPidSet_S struct {
+	pu32PcrChId HI_U32
+	u32Pid      HI_U32
+}
+
+type DMX_PcrPidGet_S = DMX_PcrPidSet_S
+
+type DMX_PcrScrGet_S struct {
+	pu32PcrChId HI_U32
+	reserve     HI_U32
+	u64PcrValue HI_U64
+	u64ScrValue HI_U64
+}
+
+type DMX_PcrValGet_S struct {
+	pu32PcrChId HI_U32
+	u32PcrMs    HI_U32
+}
+
+type DMX_PCRSYNC_S struct {
+	u32PcrChId    HI_U32
+	u32SyncHandle HI_U32
+}
+
+type DMX_PesBufAttach_S struct {
+	hChannel HI_HANDLE
+	stPesBuf HI_MMZ_BUF_S
+}
+
+type DMX_PesBufStaGet_S struct {
+	hChannel  HI_HANDLE
+	stBufStat HI_MPI_DMX_BUF_STATUS_S
+}
+
+type DMX_PesBufGet_S struct {
+	hChannel   HI_HANDLE
+	BufPhyAddr HI_U32
+	BufSize    HI_U32
+	PtsMs      HI_U32
+}
+
+type DMX_Rec_CreateChan_S struct {
+	RecHandle     HI_HANDLE
+	RecAttr       HI_UNF_DMX_REC_ATTR_S
+	RecBufPhyAddr HI_U32
+	RecBufSize    HI_U32
+	RecBufFlag    DMX_BUF_FLAG_E
+}
+
+type DMX_Rec_AddPid_S struct {
+	RecHandle  HI_HANDLE
+	ChanHandle HI_HANDLE
+	Pid        HI_U32
+}
+
+type DMX_Rec_DelPid_S struct {
+	RecHandle  HI_HANDLE
+	ChanHandle HI_HANDLE
+}
+
+type DMX_Rec_ExcludePid_S struct {
+	RecHandle HI_HANDLE
+	Pid       HI_U32
+}
+
+type DMX_Rec_AcquireData_S struct {
+	RecHandle  HI_HANDLE
+	BufPhyAddr HI_U32
+	BufSize    HI_U32
+	TimeoutMs  HI_U32
+}
+
+type DMX_Rec_ReleaseData_S struct {
+	RecHandle  HI_HANDLE
+	BufPhyAddr HI_U32
+	BufSize    HI_U32
+}
+
+type DMX_Rec_AcquireScd_S struct {
+	RecHandle HI_HANDLE
+	RecData   HI_UNF_DMX_REC_DATA_S
+	TimeoutMs HI_U32
+}
+
+type DMX_Rec_ReleaseScd_S struct {
+	RecHandle HI_HANDLE
+	RecData   HI_UNF_DMX_REC_DATA_S
+}
+
+type DMX_Rec_AcquireIndex_S struct {
+	RecHandle HI_HANDLE
+	IndexData HI_UNF_DMX_REC_INDEX_S
+	TimeoutMs HI_U32
+}
+
+type DMX_Rec_ProcessDataIndex_S struct {
+	RecHandle  HI_HANDLE
+	RecDataIdx HI_UNF_DMX_REC_DATA_INDEX_S
+}
+
+/* Compat define for HI_UNF_DMX_REC_DATA_INDEX_S. */
+type DMX_Compat_REC_DATA_INDEX_S struct {
+	u32IdxNum     HI_U32
+	u32RecDataCnt HI_U32
+	stIndex       [DMX_MAX_IDX_ACQUIRED_EACH_TIME]HI_UNF_DMX_REC_INDEX_S
+	stRecData     [2]struct {
+		Reserved       HI_U32
+		u32DataPhyAddr HI_U32
+		u32Len         HI_U32
+	}
+}
+
+type DMX_Compat_Rec_ProcessDataIndex_S struct {
+	RecHandle  HI_HANDLE
+	RecDataIdx DMX_Compat_REC_DATA_INDEX_S
+}
+
+type DMX_Rec_BufStatus_S struct {
+	RecHandle HI_HANDLE
+	BufStatus HI_UNF_DMX_RECBUF_STATUS_S
+}
+
+type DMX_ChanChanTsCnt_S struct {
+	hChannel     HI_HANDLE
+	u32ChanTsCnt HI_U32
+}
+
+type DMX_SetChan_CC_REPEAT_S struct {
+	stChCCRepeatSet HI_UNF_DMX_CHAN_CC_REPEAT_SET_S
+}
+
+type RMX_Create_S struct {
+	Attr   HI_MPI_RMX_ATTR_S /* [in] */
+	Handle HI_HANDLE         /* [out] */
+}
+
+type RMX_Attr_S struct {
+	Handle HI_HANDLE         /*[in] */
+	Attr   HI_MPI_RMX_ATTR_S /* [in/out] */
+}
+
+type RMX_Add_Pump_S struct {
+	RmxHandle  HI_HANDLE              /* [in] */
+	Attr       HI_MPI_RMX_PUMP_ATTR_S /* [in] */
+	PumpHandle HI_HANDLE              /* [out] */
+}
+
+type RMX_Pump_Attr_S struct {
+	PumpHandle HI_HANDLE              /* [in] */
+	Attr       HI_MPI_RMX_PUMP_ATTR_S /* [out] */
+}
